@@ -1,0 +1,55 @@
+class Solitaire:
+    def __init__(self, cards):
+        self.piles = []
+        self.num_cards = len(cards)
+        self.num_piles = (self.num_cards // 8) + 3
+        self.max_num_moves = self.num_cards * 2
+
+        for i in range(self.num_piles):
+            self.piles.append(CardPile())
+
+        # put all cards into pile[0]
+        for c in cards:
+            self.piles[0].add_bottom(c)
+
+    def get_pile(self, i):
+        return self.piles[i]
+
+    def display(self):
+        for i in range(self.num_piles):
+            print(f"{i}: ", end="")
+            self.piles[i].print_all(i)
+
+    def move(self, p1, p2):
+        # Condition 1: p1 = p2 = 0
+        if p1 == 0 and p2 == 0:
+            if self.piles[0].size() > 0:
+                card = self.piles[0].remove_top()
+                self.piles[0].add_bottom(card)
+            return
+
+        # Condition 2: p1 = 0, p2 > 0
+        elif p1 == 0 and p2 > 0:
+            if self.piles[0].size() == 0:
+                return  # invalid move
+            card1 = self.piles[0].peek_top()
+            if self.piles[p2].size() == 0:
+                # can move top card to empty pile
+                self.piles[p2].add_bottom(self.piles[0].remove_top())
+            else:
+                card2 = self.piles[p2].peek_bottom()
+                if card1 == card2 - 1:
+                    self.piles[p2].add_bottom(self.piles[0].remove_top())
+            return
+
+        # Condition 3: p1 > 0, p2 > 0
+        elif p1 > 0 and p2 > 0:
+            if self.piles[p1].size() == 0 or self.piles[p2].size() == 0:
+                return  # invalid
+            card1 = self.piles[p1].peek_top()
+            card2 = self.piles[p2].peek_bottom()
+            if card1 == card2 - 1:
+                # move entire pile p1 to bottom of pile p2
+                while self.piles[p1].size() > 0:
+                    self.piles[p2].add_bottom(self.piles[p1].remove_top())
+            return
