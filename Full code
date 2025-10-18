@@ -1,0 +1,134 @@
+class CardPile:
+    def __init__(self):
+        self.items = []
+
+    def add_top(self, item):
+        self.items.insert(0, item)
+
+    def add_bottom(self, item):
+        self.items.append(item)
+
+    def remove_top(self):
+        if self.size() > 0:
+            return self.items.pop(0)
+        return None
+
+    def remove_bottom(self):
+        if self.size() > 0:
+            return self.items.pop()
+        return None
+
+    def size(self):
+        return len(self.items)
+
+    def peek_top(self):
+        if self.size() > 0:
+            return self.items[0]
+        return None
+
+    def peek_bottom(self):
+        if self.size() > 0:
+            return self.items[-1]
+        return None
+
+    def print_all(self, index):
+        if index == 0:
+            if self.size() > 0:
+                output = [str(self.items[0])] + ['*'] * (self.size() - 1)
+                print(" ".join(output))
+            else:
+                print()
+        else:
+            print(" ".join(str(x) for x in self.items))
+
+
+class Solitaire:
+    def __init__(self, cards):
+        self.piles = []
+        self.num_cards = len(cards)
+        self.num_piles = (self.num_cards // 8) + 3
+        self.max_num_moves = self.num_cards * 2
+
+        for i in range(self.num_piles):
+            self.piles.append(CardPile())
+
+        for c in cards:
+            self.piles[0].add_bottom(c)
+
+    def display(self):
+        for i in range(self.num_piles):
+            print(f"{i}: ", end="")
+            self.piles[i].print_all(i)
+
+    def move(self, p1, p2):
+        # Condition 1: move top to bottom in pile 0
+        if p1 == 0 and p2 == 0:
+            if self.piles[0].size() > 0:
+                card = self.piles[0].remove_top()
+                self.piles[0].add_bottom(card)
+            return
+
+        # Condition 2: move top card from pile 0 to bottom of another pile
+        elif p1 == 0 and p2 > 0:
+            if self.piles[0].size() == 0:
+                return
+            card1 = self.piles[0].peek_top()
+            if self.piles[p2].size() == 0:
+                self.piles[p2].add_bottom(self.piles[0].remove_top())
+            else:
+                card2 = self.piles[p2].peek_bottom()
+                if card1 == card2 - 1:
+                    self.piles[p2].add_bottom(self.piles[0].remove_top())
+            return
+
+        # Condition 3: move entire pile from p1 to bottom of p2
+        elif p1 > 0 and p2 > 0:
+            if self.piles[p1].size() == 0 or self.piles[p2].size() == 0:
+                return
+            card1 = self.piles[p1].peek_top()
+            card2 = self.piles[p2].peek_bottom()
+            if card1 == card2 - 1:
+                while self.piles[p1].size() > 0:
+                    self.piles[p2].add_bottom(self.piles[p1].remove_top())
+            return
+
+    def is_complete(self):
+        # The player wins if:
+        # 1. Pile 0 is empty
+        # 2. All cards are in exactly one other pile (others empty)
+        # 3. (Cards are in decreasing order — guaranteed by move rules)
+        if self.piles[0].size() != 0:
+            return False
+
+        non_empty_piles = [pile for pile in self.piles[1:] if pile.size() > 0]
+
+        # must have exactly one non-empty pile
+        if len(non_empty_piles) != 1:
+            return False
+
+        pile = non_empty_piles[0].items
+
+        # optional strict check for decreasing order
+        for i in range(len(pile) - 1):
+            if pile[i] != pile[i + 1] + 1:
+                return False
+
+        return True
+
+    def play(self):
+        print("********************** NEW GAME *****************************")
+        move_number = 1
+        while move_number <= self.max_num_moves and not self.is_complete():
+            self.display()
+            print("Round", move_number, "out of", self.max_num_moves, end=": ")
+            pile1 = int(input("Move from pile no.: "))
+            print("Round", move_number, "out of", self.max_num_moves, end=": ")
+            pile2 = int(input("Move to pile no.: "))
+            if 0 <= pile1 < self.num_piles and 0 <= pile2 < self.num_piles:
+                self.move(pile1, pile2)
+            move_number += 1
+
+        if self.is_complete():
+            print("You Win in", move_number - 1, "steps!\n")
+        else:
+            print("You Lose!\n")
