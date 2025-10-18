@@ -1,0 +1,23 @@
+class Solitaire:
+    def __init__(self, cards):
+        self.piles = []
+        self.num_cards = len(cards)
+        self.num_piles = (self.num_cards // 8) + 3
+        self.max_num_moves = self.num_cards * 2
+
+        # create empty piles
+        for i in range(self.num_piles):
+            self.piles.append(CardPile())
+
+        # put all cards into pile 0 (bottom to top order)
+        for i in range(self.num_cards):
+            self.piles[0].add_bottom(cards[i])
+
+    def get_pile(self, i):
+        return self.piles[i]
+
+    def display(self):
+        # display all piles
+        for i in range(self.num_piles):
+            print(f"{i}: ", end="")
+            self.piles[i].print_all(i)
