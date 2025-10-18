@@ -1,0 +1,57 @@
+class CardPile:
+    def __init__(self):
+        # list to store cards; first item is the top of the pile
+        self.items = []
+
+    def add_top(self, item):
+        # insert at the beginning (top)
+        self.items.insert(0, item)
+
+    def add_bottom(self, item):
+        # append at the end (bottom)
+        self.items.append(item)
+
+    def remove_top(self):
+        # remove and return top card
+        if self.size() > 0:
+            return self.items.pop(0)
+        else:
+            return None
+
+    def remove_bottom(self):
+        # remove and return bottom card
+        if self.size() > 0:
+            return self.items.pop()
+        else:
+            return None
+
+    def size(self):
+        # return number of cards
+        return len(self.items)
+
+    def peek_top(self):
+        # look at top card
+        if self.size() > 0:
+            return self.items[0]
+        else:
+            return None
+
+    def peek_bottom(self):
+        # look at bottom card
+        if self.size() > 0:
+            return self.items[-1]
+        else:
+            return None
+
+    def print_all(self, index):
+        # print all cards from top to bottom
+        if index == 0:
+            # only show top card, rest as *
+            if self.size() > 0:
+                output = [str(self.items[0])] + ['*'] * (self.size() - 1)
+                print(" ".join(output))
+            else:
+                print()  # empty pile
+        else:
+            # show all cards
+            print(" ".join(str(x) for x in self.items))
